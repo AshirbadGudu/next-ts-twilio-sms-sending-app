@@ -9,14 +9,20 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  const { body } = req
+  const { method } = req
+  if (method === 'GET')
+    return res.status(200).json({ message: 'GET request for sending sms' })
+  if (method !== 'POST')
+    return res.status(405).json({ message: 'This method is not allowed' })
   const accountSid = process.env.TWILIO_ACCOUNT_SID
   const authToken = process.env.TWILIO_AUTH_TOKEN
   const client = twilio(accountSid, authToken)
   client.messages
     .create({
-      body: 'Hello From Twilio',
+      body: body.message,
       from: '+19035827937',
-      to: '+917008614546',
+      to: body.phoneNumber,
     })
     .then((message) => {
       console.log(message)
